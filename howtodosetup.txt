@@ -1,0 +1,327 @@
+================================================================================
+AGENTMEMORY SETUP GUIDE — Complete Installation & Configuration
+================================================================================
+Updated: 2026-06-08
+Purpose: Get agentmemory running with your Kiro orchestrator system.
+
+
+================================================================================
+PREREQUISITES
+================================================================================
+
+1. Node.js >= 18.0.0 (recommended: 20+)
+   Check: node --version
+
+2. npm (comes with Node.js)
+   Check: npm --version
+
+3. macOS, Linux, or Windows (WSL2 recommended on Windows)
+
+
+================================================================================
+STEP 1: INSTALL AGENTMEMORY (Global)
+================================================================================
+
+  npm install -g @agentmemory/agentmemory
+
+If you get EACCES permission error on macOS/Linux:
+
+  sudo npm install -g @agentmemory/agentmemory
+
+Verify installation:
+
+  agentmemory --version
+
+
+================================================================================
+STEP 2: START THE MEMORY SERVER
+================================================================================
+
+Open a SEPARATE terminal (it runs as a background service):
+
+  agentmemory
+
+This starts:
+  - REST API on port 3111
+  - WebSocket on port 3112 (internal)
+  - Real-time viewer on port 3113
+  - iii-engine bridge on port 49134 (internal)
+
+Verify it's running:
+
+  curl http://localhost:3111/agentmemory/health
+
+Expected: {"status":"ok",...}
+
+To stop:
+
+  agentmemory stop
+
+
+================================================================================
+STEP 3: KIRO MCP CONFIGURATION (Already Done)
+================================================================================
+
+File: .kiro/settings/mcp.json
+
+  {
+    "mcpServers": {
+      "agentmemory": {
+        "command": "npx",
+        "args": ["-y", "@agentmemory/mcp"],
+        "env": {
+          "AGENTMEMORY_URL": "http://localhost:3111"
+        },
+        "disabled": false,
+        "autoApprove": ["memory_smart_search", "memory_recall", "memory_save", "memory_sessions"]
+      }
+    }
+  }
+
+This is ALREADY configured in your workspace. No action needed here.
+
+
+================================================================================
+STEP 4: VERIFY MCP CONNECTION IN KIRO
+================================================================================
+
+1. Make sure agentmemory server is running (Step 2)
+2. In Kiro, open Command Palette → "MCP: Reconnect Servers"
+3. The agentmemory MCP server should appear as connected
+4. You should see tools: memory_smart_search, memory_recall, memory_save, etc.
+
+If it shows "disconnected":
+  - Confirm server is running: curl http://localhost:3111/agentmemory/health
+  - Check Kiro's MCP output panel for errors
+  - Try: agentmemory doctor (interactive diagnostics)
+
+
+================================================================================
+STEP 5: SEED DEMO DATA (Optional — Test It Works)
+================================================================================
+
+  agentmemory demo
+
+This seeds 3 sample sessions and runs semantic search against them.
+Proves hybrid BM25+vector retrieval is working.
+
+Open the viewer to see it visually:
+
+  open http://localhost:3113
+
+
+================================================================================
+STEP 6: CONFIGURE EMBEDDINGS (Optional)
+================================================================================
+
+DEFAULT: Local embeddings (all-MiniLM-L6-v2) — FREE, no API key needed.
+This is already active. No configuration required.
+
+OPTIONAL: For better embeddings, install the transformer package:
+
+  npm install -g @xenova/transformers
+
+This gives you BGE-small entirely on-device. Zero cost.
+
+OPTIONAL: If you want cloud embeddings (not needed for BFSI):
+
+  # Create ~/.agentmemory/.env
+  mkdir -p ~/.agentmemory
+  echo "EMBEDDING_PROVIDER=local" > ~/.agentmemory/.env
+
+Other providers (Gemini, OpenAI, Voyage) need API keys in that .env file.
+For BFSI compliance: stick with local. No data leaves your machine.
+
+
+================================================================================
+STEP 7: CONFIGURE LLM PROVIDER (Optional — Enhances Compression)
+================================================================================
+
+WITHOUT an LLM provider: agentmemory still works! BM25 keyword search +
+vector similarity + synthetic compression all function without any LLM.
+
+WITH an LLM provider: enables richer compression and summarization of sessions.
+
+Options (add to ~/.agentmemory/.env):
+
+  # Option A: Local model via Ollama (FREE, recommended)
+  OPENAI_API_KEY=ollama
+  OPENAI_BASE_URL=http://localhost:11434/v1
+  OPENAI_MODEL=qwen2.5-coder:7b
+
+  # Option B: Local model via LM Studio (FREE)
+  OPENAI_API_KEY=lmstudio
+  OPENAI_BASE_URL=http://localhost:1234/v1
+  OPENAI_MODEL=qwen2.5-coder-7b-instruct
+
+  # Option C: Anthropic API (paid)
+  ANTHROPIC_API_KEY=sk-ant-...
+
+  # Option D: OpenAI API (paid)
+  OPENAI_API_KEY=sk-...
+
+For BFSI: Use Option A or B (Ollama/LM Studio). Data stays local.
+
+
+================================================================================
+STEP 8: AUTO-START (Optional — Run on Boot)
+================================================================================
+
+macOS (launchd):
+
+  # Create a plist or just run in a dedicated terminal tab
+  # Simplest: add to your .zshrc or .bashrc:
+  alias am="agentmemory"
+  alias amstart="agentmemory &"
+
+Linux (systemd):
+
+  # Create ~/.config/systemd/user/agentmemory.service
+  [Unit]
+  Description=AgentMemory Server
+  After=network.target
+
+  [Service]
+  ExecStart=/usr/local/bin/agentmemory
+  Restart=on-failure
+
+  [Install]
+  WantedBy=default.target
+
+  # Enable:
+  systemctl --user enable agentmemory
+  systemctl --user start agentmemory
+
+
+================================================================================
+HOW IT INTEGRATES WITH YOUR ORCHESTRATOR
+================================================================================
+
+HOOK 04 (04-auto-memory-retrieval.kiro.hook):
+  - Fires on every prompt you send
+  - Tells the agent to query memory_smart_search with relevant keywords
+  - Falls back to flat-file checkpoint.md if server is down
+  - No manual action needed — it's automatic
+
+HOOK 03 (03-memory-discipline.kiro.hook):
+  - At session end, persists important context to init_docs/
+  - agentmemory captures this automatically via its own hooks too
+
+FLOW:
+  1. You send a prompt
+  2. Hook 04 fires → agent calls memory_smart_search("relevant keywords")
+  3. agentmemory returns hybrid BM25+vector results (top-K, token-budgeted)
+  4. Agent has relevant past context without reading full flat files
+  5. During work, agentmemory silently captures tool uses
+  6. At session end, compressed observations stored for next session
+
+
+================================================================================
+KEY TOOLS AVAILABLE VIA MCP
+================================================================================
+
+| Tool | What It Does |
+|------|-------------|
+| memory_smart_search | Hybrid BM25+vector search over all memories |
+| memory_recall | Retrieve specific memories by ID or query |
+| memory_save | Manually save important context |
+| memory_sessions | List past sessions |
+| memory_export | Export all memory as JSON |
+| memory_audit | View operation audit trail |
+| memory_governance_delete | Delete specific memories (GDPR) |
+
+Full server (53 tools) available when AGENTMEMORY_TOOLS=all is set.
+Default is "core" (7 tools) which is sufficient for this setup.
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "agentmemory: command not found"
+  → npm install -g @agentmemory/agentmemory
+  → Or use: npx @agentmemory/agentmemory
+
+PROBLEM: Port 3111 already in use
+  → lsof -i :3111
+  → pkill -f agentmemory
+  → agentmemory (restart)
+
+PROBLEM: MCP shows disconnected in Kiro
+  → Ensure server is running: curl http://localhost:3111/agentmemory/health
+  → Reconnect: Command Palette → "MCP: Reconnect Servers"
+  → Check: .kiro/settings/mcp.json has disabled: false
+
+PROBLEM: memory_smart_search returns empty results
+  → Server just started? Run: agentmemory demo (seeds test data)
+  → Or just use it — memories build up automatically over sessions
+
+PROBLEM: npx serves stale version
+  → npx -y @agentmemory/agentmemory@latest
+  → Or: rm -rf ~/.npm/_npx && npx @agentmemory/agentmemory
+
+PROBLEM: iii-engine not found (from-source builds)
+  → macOS arm64: curl -fsSL https://github.com/iii-hq/iii/releases/download/iii/v0.11.2/iii-aarch64-apple-darwin.tar.gz | tar -xz -C ~/.local/bin
+  → macOS x64: swap aarch64-apple-darwin for x86_64-apple-darwin
+  → Linux x64: swap for x86_64-unknown-linux-gnu
+
+PROBLEM: Windows issues
+  → Use WSL2 (recommended)
+  → Or: download iii.exe from https://github.com/iii-hq/iii/releases/tag/iii%2Fv0.11.2
+  → Place in %USERPROFILE%\.local\bin\iii.exe
+
+
+================================================================================
+QUICK START (TL;DR)
+================================================================================
+
+  # Terminal 1: Start the server
+  npm install -g @agentmemory/agentmemory
+  agentmemory
+
+  # Terminal 2: Verify
+  curl http://localhost:3111/agentmemory/health
+
+  # In Kiro: Reconnect MCP servers
+  # Done. Hook 04 auto-queries on every prompt.
+
+
+================================================================================
+WHAT YOU DON'T NEED ANYMORE
+================================================================================
+
+✗ Mem0 API key (MEM0_API_KEY) — removed, not needed
+✗ uvx / Python package manager — agentmemory is pure Node.js
+✗ External vector DB (Qdrant, pgvector) — SQLite built-in
+✗ Cloud services — everything runs locally
+✗ Manual memory management — auto-capture via hooks
+
+
+================================================================================
+SECURITY / BFSI COMPLIANCE NOTES
+================================================================================
+
+- ALL data stays on your machine (SQLite + local embeddings)
+- No external API calls unless YOU configure an LLM provider
+- No telemetry, no phone-home, no cloud dependencies
+- Apache-2.0 license (permissive, enterprise-friendly)
+- Privacy filter strips API keys and secrets before storage
+- AGENTMEMORY_SECRET can be set for auth if exposing beyond localhost
+- Viewer binds to 127.0.0.1 only (not exposed to network)
+
+
+================================================================================
+PORTS REFERENCE
+================================================================================
+
+| Port | Service | Purpose |
+|------|---------|---------|
+| 3111 | agentmemory | REST API + MCP HTTP + health check |
+| 3112 | iii-engine | Internal streams (don't expose) |
+| 3113 | agentmemory | Real-time viewer (browser UI) |
+| 49134 | iii-engine | WebSocket bridge (internal) |
+
+
+================================================================================
+END
+================================================================================

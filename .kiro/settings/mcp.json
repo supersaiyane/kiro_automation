@@ -1,14 +1,13 @@
 {
   "mcpServers": {
-    "mem0": {
-      "command": "uvx",
-      "args": ["mem0-mcp-server@latest"],
+    "agentmemory": {
+      "command": "npx",
+      "args": ["-y", "@agentmemory/mcp"],
       "env": {
-        "MEM0_API_KEY": "${MEM0_API_KEY}",
-        "FASTMCP_LOG_LEVEL": "ERROR"
+        "AGENTMEMORY_URL": "http://localhost:3111"
       },
-      "disabled": true,
-      "autoApprove": ["search_memory", "get_all_memories"]
+      "disabled": false,
+      "autoApprove": ["memory_smart_search", "memory_recall", "memory_save", "memory_sessions"]
     }
   }
 }

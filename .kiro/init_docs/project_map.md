@@ -13,12 +13,12 @@
 │   ├── 01-token-discipline.kiro.hook
 │   ├── 02-context-discipline.kiro.hook
 │   ├── 03-memory-discipline.kiro.hook
-│   ├── 04-auto-memory-retrieval.kiro.hook  ← NEW: Mem0 query on promptSubmit
-│   └── 05-compression-feedback.kiro.hook   ← NEW: Learn from compression failures
+│   ├── 04-auto-memory-retrieval.kiro.hook  ← agentmemory query on promptSubmit (v2.0)
+│   └── 05-compression-feedback.kiro.hook   ← Learn from compression failures
 ├── init_docs/
 │   ├── checkpoint.md       ← Session resume vectors
 │   ├── lessons.md          ← Self-improvement rules (2 entries)
-│   ├── decisions.md        ← ADR index (ADR-001 to ADR-012)
+│   ├── decisions.md        ← ADR index (ADR-001 to ADR-015)
 │   └── project_map.md     ← THIS FILE
 ├── skills/                 ← 19 role skill directories (all SKILL.md fixed with frontmatter)
 │   ├── market_researcher/
@@ -74,6 +74,7 @@ docs/
 - **Orchestrator:** Discovery-first routing enforced. 7 questions → score → selective agent activation.
 - **All 19 SKILL.md files:** Fixed with proper `name` + `description` frontmatter.
 - **Disciplines:** v2.0 — split into 3 files (core always ~100 lines + 2 conditional). GREEN.
-- **Mem0 MCP:** Configured in .kiro/settings/mcp.json. Requires MEM0_API_KEY env var.
-- **ADRs:** 13 active decisions (ADR-001 to ADR-013).
+- **agentmemory MCP:** Configured in .kiro/settings/mcp.json. Local-only, no API key needed (ADR-015).
+- **ADRs:** 15 active decisions (ADR-001 to ADR-015).
+- **howtodosetup.txt:** Complete agentmemory installation + configuration guide (root).
 - **Lessons:** 2 entries (mode-first, discovery-before-mode-overkill).

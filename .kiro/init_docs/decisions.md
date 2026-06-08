@@ -16,3 +16,4 @@
 | ADR-012 | Discovery-first routing before mode selection | 2026-06-06 | Accepted | 7 scoping questions determine complexity score (0-21); score maps to tier + agent subset; prevents overkill |
 | ADR-013 | Adopt 5 SOTA discipline patterns (AtomMem, Adaptive Pruning, Continuous Eviction, Acon, Agent Isolation) | 2026-06-06 | Accepted | Memory writes gated by relevance; pruning by task-relevance not time; evict every 10 exchanges; learn from compression failures; subagents get <2000 token summaries only |
 | ADR-014 | Testing + discipline reports mandatory in ALL modes (including Mode 3) | 2026-06-06 | Accepted | No code ships without tests; Mode 3 gets inline test+burn report; build incomplete without passing tests |
+| ADR-015 | Replace Mem0 with agentmemory for persistent memory | 2026-06-08 | Accepted | Local-first hybrid BM25+vector via @agentmemory/mcp; no API key needed; BFSI compliant; 0 external DBs |

@@ -1,12 +1,12 @@
 {
   "name": "Auto Memory Retrieval",
-  "version": "1.0.0",
-  "description": "On every prompt, remind agent to query Mem0 for relevant context before working. Replaces manual checkpoint grep.",
+  "version": "2.0.0",
+  "description": "On every prompt, remind agent to query agentmemory for relevant context before working. Uses memory_smart_search MCP tool with hybrid BM25+vector retrieval.",
   "when": {
     "type": "promptSubmit"
   },
   "then": {
     "type": "askAgent",
-    "prompt": "Before starting work: if Mem0 MCP is available, query it with keywords from the user's message to retrieve relevant past decisions, lessons, and context. Use search_memory with 2-3 keywords extracted from the prompt. If Mem0 is not connected, fall back to reading the last 10 lines of .kiro/init_docs/checkpoint.md. Do NOT dump all memory — retrieve ONLY what matches the current task."
+    "prompt": "Before starting work: if agentmemory MCP is available, query it with keywords from the user's message to retrieve relevant past decisions, lessons, and context. Use memory_smart_search with 2-3 keywords extracted from the prompt. If agentmemory is not connected, fall back to reading the last 10 lines of .kiro/init_docs/checkpoint.md. Do NOT dump all memory — retrieve ONLY what matches the current task."
   }
 }

@@ -49,3 +49,58 @@ Open tasks: (1) CalcApp Scrum Master + GATE 2, (2) Add tests to rest-tester
 Key decisions: ADR-001 to ADR-014
 Resume at: .kiro/docs/HOW-TO-USE-THIS-SETUP.txt:1
 Next session first action: Resume CalcApp (Scrum Master) or start fresh project to validate full system
+
+| 2025-07-15T00:00:00Z | Git commit + push: orchestrator v2.0 (247 files) to github.com/supersaiyane/kiro_automation | DONE | all .kiro/*, TestDiscoverydocs/*, Testing_App_rest-tester/*, root docs | commit 73d5f61 on origin/main |
+
+### Session Handoff — 2025-07-15T00:00:00Z
+Product: Orchestrator System
+Phase: Initial commit + push complete. Repo live on GitHub.
+Last action: git push -u origin main (275 objects, 708 KiB)
+Open tasks: (1) CalcApp Scrum Master + GATE 2, (2) Add tests to rest-tester
+Key decisions: ADR-001 to ADR-014
+Resume at: commit 73d5f61 on origin/main
+Next session first action: Resume CalcApp OR start new project to validate system
+
+| 2026-06-08T01:00:00Z | Git commit+push to origin/main + memory tool evaluation (agentmemory recommended) | DONE | .kiro/init_docs/checkpoint.md | .kiro/settings/mcp.json:1 (next: wire agentmemory) |
+
+### Session Handoff — 2026-06-08T01:00:00Z
+Product: Orchestrator System
+Phase: Memory backend selection complete. agentmemory chosen over Mem0.
+Last action: Evaluated 4 memory tools against system requirements, recommended agentmemory (local, hybrid BM25+vector, MCP-compatible)
+Open tasks: (1) Wire agentmemory into mcp.json + hook 04, (2) CalcApp Scrum Master + GATE 2, (3) Add tests to rest-tester
+Key decisions: ADR-001 to ADR-014 + pending ADR-015 (agentmemory over Mem0)
+Resume at: .kiro/settings/mcp.json:1
+Next session first action: Install agentmemory MCP server, update mcp.json, update hook 04 retrieval logic
+
+| 2026-06-08T02:00:00Z | Replaced Mem0 with agentmemory in mcp.json + hook 04 | DONE | .kiro/settings/mcp.json, .kiro/hooks/04-auto-memory-retrieval.kiro.hook | .kiro/settings/mcp.json:1 |
+
+### Session Handoff — 2026-06-08T02:00:00Z
+Product: Orchestrator System
+Phase: Memory backend migration complete (Mem0 → agentmemory)
+Last action: Rewrote mcp.json (agentmemory MCP) + hook 04 (memory_smart_search)
+Open tasks: (1) npm install -g @agentmemory/agentmemory + run server, (2) CalcApp Scrum Master + GATE 2, (3) Add tests to rest-tester
+Key decisions: ADR-015
+Resume at: .kiro/settings/mcp.json:1
+Next session first action: Run `npm install -g @agentmemory/agentmemory && agentmemory` to start server, then verify MCP connects in Kiro
+
+| 2026-06-08T02:30:00Z | Created howtodosetup.txt (agentmemory full setup guide) | DONE | howtodosetup.txt | howtodosetup.txt:1 |
+
+### Session Handoff — 2026-06-08T02:30:00Z
+Product: Orchestrator System
+Phase: agentmemory integration complete. Setup doc written.
+Last action: Created howtodosetup.txt with full install/config/troubleshooting guide
+Open tasks: (1) Run `npm install -g @agentmemory/agentmemory && agentmemory` to activate, (2) CalcApp Scrum Master + GATE 2, (3) Add tests to rest-tester
+Key decisions: ADR-015
+Resume at: howtodosetup.txt:1
+Next session first action: Install and start agentmemory server, verify MCP connects
+
+| 2025-07-15T01:00:00Z | Attempted task execution — no tasks.md found in .kiro/specs/ | BLOCKED | none | .kiro/specs/ (directory does not exist) |
+
+### Session Handoff — 2025-07-15T01:00:00Z
+Product: Orchestrator System
+Phase: No active spec. Task execution attempted but no tasks.md exists.
+Last action: Searched for tasks.md, confirmed no .kiro/specs/ directory present
+Open tasks: (1) CalcApp Scrum Master + GATE 2, (2) Add tests to rest-tester, (3) Create a spec to execute
+Key decisions: ADR-001 to ADR-015
+Resume at: No spec exists — user must create one or provide tasks.md path
+Next session first action: Create a spec (requirements → design → tasks) or resume CalcApp
