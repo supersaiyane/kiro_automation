@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Enforce Orchestrator Pipeline",
+  "description": "Routes prompts to Mode 1 (full army), Mode 2 (single agent), or Mode 3 (direct). Loads team-orchestrator.md only when Mode 1 fires.",
+  "version": "5",
+  "when": {
+    "type": "promptSubmit"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "ORCHESTRATOR ROUTING — determine mode:\n\n## MODE 1 CHECK: Full Army\nPrompt has BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT + APP/TOOL/SYSTEM/PRODUCT/FEATURE/SERVICE/API/DASHBOARD/BOT?\n\nIf YES:\n- FIRST: Load #team-orchestrator steering file (manual inclusion) into context\n- Then follow the full Think→Design→Develop chain from that constitution\n- ≥2 phases, ≥2 sprints/phase, ≥3 tasks/sprint, 8 docs/phase\n- All gates, all roles, git discipline, mapping + discipline reports\n\n## MODE 2 CHECK: Single Agent\nPrompt targets ONE role? (research, strategy, stories, architecture, sprint plan, security review, test plan, CI/CD, database, cloud, FinOps, SRE, docs)\n\nIf YES:\n- Invoke ONLY that role, produce its doc (≥300 words)\n- Do NOT load team-orchestrator.md (not needed for single agent)\n- No phases, no sprints, no git unless asked\n\n## MODE 3: Direct Execution\nNeither matches → proceed directly.\n\n## PRIORITY: Mode 1 > Mode 2 > Mode 3\n\nAnnounce which mode was selected before proceeding."
+  }
+}

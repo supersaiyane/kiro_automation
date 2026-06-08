@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Context Discipline — Headroom ContentRouter + Progressive Disclosure",
+  "description": "Fires after every tool use to enforce context hygiene. Applies the 3-layer retrieval pattern (index → filter → fetch), subagent offloading matrix, file reading priority rules, and compaction triggers. Routes content type to correct compression strategy before it enters context.",
+  "version": "1",
+  "when": {
+    "type": "postToolUse",
+    "toolTypes": ["read", "shell", "web"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "CONTEXT DISCIPLINE check — apply immediately after this tool output.\n\n## CONTENT ROUTING (apply to tool output just received)\n- Tool output / logs → cap 80 lines, strip ANSI, collapse blanks, semantic extract key signal\n- JSON → key fields only, drop nulls and empty arrays\n- Code file → if reviewing only: AST/signatures only; if editing: full content needed, keep\n- RAG / search results → score, filter, inject top-3 results only\n- Conversation history > 10 exchanges old → summarize, discard raw\n\n## 3-LAYER RETRIEVAL RULE\nNever fetch full details immediately. Always:\n1. SEARCH — compact index, IDs only\n2. FILTER — identify relevant IDs from index (no tool call)\n3. FETCH — full detail ONLY for filtered IDs\n~10× token savings vs fetching all.\n\n## SUBAGENT DECISION (after reading tool output)\nIf understanding the output requires reading 3+ more files → STOP → spawn subagent → get 300-token summary back.\nIf 1-2 follow-up queries → stay in main context.\n\n## FILE READING PRIORITY\n1. Files you WILL MODIFY NOW → read fully\n2. Interfaces/contracts → read interface only\n3. Reference patterns → get_public_api first\n4. General context → subagent summarize\nNEVER read: whole directories, test files for context, generated files, config unless needed.\n\n## COMPACTION TRIGGERS\nIf ANY apply → act immediately:\n- Read 10+ files this session → switch to MCP + subagents only\n- 50+ exchanges → summarize session to 10 lines, write checkpoint\n- Re-reading files already read → return stub reference\n- Context feels heavy → [COMPACT] now\n\n## LARGE CODEBASE (50+ files)\nget_project_graph → identify 2-3 relevant modules → find_symbol → get_public_api → read ONLY files to modify → subagents for everything else."
+  }
+}

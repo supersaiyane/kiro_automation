@@ -1,0 +1,12 @@
+{
+  "name": "Compression Feedback Loop",
+  "version": "1.0.0",
+  "description": "After agent stops, check if any task failed due to lost context. If so, write a compression lesson to prevent recurrence.",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review this session for compression failures: did any task fail because information was previously in context but got summarized/discarded? If YES: write a compression lesson to .kiro/init_docs/lessons.md in format: '## [date] — compression-failure-[type]\\n**Mistake:** [what was lost]\\n**Correction:** [what failed]\\n**Rule:** Never discard [category] when [condition]\\n**Triggers:** [keywords]'. If NO compression failures occurred, do nothing — do NOT write 'no failures' as a lesson."
+  }
+}

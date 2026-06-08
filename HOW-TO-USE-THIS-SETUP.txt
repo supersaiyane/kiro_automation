@@ -1,0 +1,312 @@
+HOW TO USE THIS SETUP (v2.0)
+==============================
+Updated: 2026-06-08
+
+This workspace has a custom AI-agent orchestration system built into the
+.kiro/ folder. It's SMART — it won't spin up 19 agents to build a calculator.
+
+
+================================================================================
+FEATURES AT A GLANCE
+================================================================================
+
+✅ Discovery-First Routing    — 7 questions → score → right-sized agent team
+✅ 4 Execution Modes          — Full Army, Single Agent, Direct, Hybrid
+✅ 19 Specialized Roles       — Market Research to SRE, all with skill files
+✅ Adaptive Token Discipline   — Caveman Ultra output, budget tiers, 2-read rule
+✅ Conditional Steering        — Files load only when relevant (saves ~60% tokens)
+✅ Session Memory (Local)      — Checkpoint, lessons, decisions, project map
+✅ AtomMem Write Gates         — Only persist novel, future-valuable, actionable info
+✅ Compression Feedback Loop   — Learns from context-loss failures automatically
+✅ Auto Memory Retrieval       — Hook queries relevant past context at session start
+✅ Context Rot Detection       — GREEN/YELLOW/RED alerts with mandatory actions
+✅ Memory Poisoning Validation — Blocks injection attempts in memory files
+✅ Self-Adaptive Pruning       — Keeps relevant context, evicts stale content
+✅ 6 Phase Reports             — QA, Security, Mapping, Discipline, Jira, Git
+✅ Mandatory Testing           — Every mode requires tests before "done"
+✅ Git Safety Rules            — Feature branches, no secrets, task IDs in commits
+✅ Overkill Prevention         — Calculator test catches over-engineering
+✅ Optional Mem0 MCP           — Vector memory (disabled by default for BFSI)
+
+
+================================================================================
+WHAT IS IT?
+================================================================================
+
+A set of steering files + hooks that give the AI different "modes" depending
+on what you're building and how complex it is. The system ASKS before assuming.
+
+
+================================================================================
+THE FLOW (Discovery-First)
+================================================================================
+
+  1. You say: "Build me a [thing]"
+  2. System asks 7 scoping questions (platform, scale, complexity, etc.)
+  3. You answer all 7 (takes 30 seconds)
+  4. System scores your answers (0-21 points)
+  5. System recommends a MODE + which AGENTS to activate
+  6. You confirm (or override)
+  7. Work begins with ONLY the justified agents
+
+
+================================================================================
+THE 7 QUESTIONS
+================================================================================
+
+  1. PLATFORM    — Web? Mobile? CLI? Library? Multiple?
+  2. SCALE       — Just you? Small team? Public? SaaS business?
+  3. COMPLEXITY  — Simple (1-2 features)? Medium? Complex? Enterprise?
+  4. DEPLOYMENT  — Local? Single server? Cloud? Multi-region?
+  5. REVENUE     — Free? Subscription? Enterprise licensing?
+  6. DESIGN/UX   — None (CLI)? Basic? Polished? Branded?
+  7. SECURITY    — Minimal? Basic auth? GDPR? Regulated (HIPAA/SOC2)?
+
+Each answer scores 0-3 points. Total determines your tier.
+
+
+================================================================================
+THE 4 COMPLEXITY TIERS
+================================================================================
+
+MINIMAL (Score 0-4) → Mode 3
+  No agents. AI just codes it directly.
+  Example: "Build me a calculator" (score ~1)
+
+LIGHT (Score 5-9) → Mode 4 Lite
+  3-5 agents (lite versions), basic planning, then code.
+  Example: "Build a task manager for my team" (score ~8)
+
+STANDARD (Score 10-14) → Mode 4
+  8-12 agents, full spec planning, then army execution.
+  Example: "Build a mobile fitness tracker" (score ~14)
+
+FULL (Score 15-21) → Mode 1
+  ALL 19 agents. Think → Design → Develop pipeline.
+  Example: "Build a fintech payment platform" (score ~20)
+
+
+================================================================================
+THE 4 MODES
+================================================================================
+
+MODE 1: Full Army Pipeline
+  When: Score 15-21 or you say "mode 1"
+  What: 19 roles. Think → Design → Develop. 8+ docs/phase. All gates.
+        6 reports per phase. Git discipline. Multi-sprint.
+
+MODE 2: Single Agent
+  When: You ask for ONE specific deliverable
+  What: Only one role fires. One focused document produced.
+  Examples: "security review", "sprint plan", "architecture diagram"
+
+MODE 3: Direct Execution
+  When: Score 0-4, "just build it", bug fixes, refactors
+  What: No agents. No docs overhead. Just code + tests.
+
+MODE 4: Hybrid (Spec + Army)
+  When: Score 5-14 or you say "mode 4"
+  What: Planning phase (requirements → design → tasks) THEN army execution.
+  Lite (5-9): fewer agents, lite artifacts
+  Standard (10-14): 8-12 agents, full artifacts
+
+
+================================================================================
+BYPASSES (Skip Discovery)
+================================================================================
+
+| You say...                       | What happens                           |
+|----------------------------------|----------------------------------------|
+| "just build it"                  | Mode 3 directly                        |
+| "skip questions"                 | Mode 3 directly                        |
+| "mode 1: build an app"           | Mode 1, all 19 agents                  |
+| "mode 2: security review"        | Mode 2, single agent                   |
+| "mode 3: make a script"          | Mode 3, direct code                    |
+| "mode 4: build a dashboard"      | Mode 4, hybrid                         |
+| Bug fix / refactor / question    | Mode 3 automatically                   |
+
+
+================================================================================
+TOKEN & CONTEXT DISCIPLINE (Automatic)
+================================================================================
+
+This runs automatically — you don't configure anything. But here's what it does:
+
+CAVEMAN ULTRA OUTPUT:
+  - Terse, technical fragments. No filler words.
+  - Banned: "Let me...", "I'll now...", "Sure!", "Absolutely"
+  - Self-check: "Can I cut 50% and lose zero info?"
+
+BUDGET TIERS:
+  | Tier       | Reads | Tool Calls | Action                        |
+  |------------|-------|------------|-------------------------------|
+  | PEAK       | 0-4   | 0-9        | Normal operations             |
+  | GOOD       | 5-7   | 10-14      | Targeted line ranges only     |
+  | DEGRADING  | 8-11  | 15-19      | Map-only, pause and ask user  |
+  | CRITICAL   | 12+   | 20+        | FULL STOP, new session        |
+
+CONTEXT HEADROOM:
+  - 85% capacity → warning + summary-only mode
+  - 90% capacity → STOP, checkpoint, recommend fresh session
+  - 50+ exchanges → mandatory checkpoint
+
+CONDITIONAL STEERING (v2.0 — NEW):
+  - Core rules (~100 lines) load every session
+  - Memory management rules load ONLY when touching init_docs/
+  - Report templates load ONLY when working in phase docs/
+  - Saves ~60% token cost vs. old always-load-everything approach
+
+
+================================================================================
+MEMORY SYSTEM (Local, No Third-Party)
+================================================================================
+
+All memory stays in .kiro/init_docs/ as flat markdown files:
+
+  checkpoint.md  — Session resume vectors (what was done, where to continue)
+  lessons.md     — Rules learned from mistakes (user corrections only)
+  decisions.md   — ADR index (architectural decisions)
+  project_map.md — Current file structure and project state
+
+WRITE GATES (AtomMem — prevents memory pollution):
+  Before ANY write, must pass 3 checks:
+  1. NOVELTY — does this already exist? Skip if duplicate.
+  2. FUTURE VALUE — will another session need this? Skip if not.
+  3. SIGNAL DENSITY — is this actionable? Skip if just status noise.
+
+POISONING VALIDATION:
+  Blocks writes containing: injection attempts, code execution patterns,
+  base64, secrets, or oversized entries.
+
+AUTO-RETRIEVAL (Hook):
+  At session start, relevant past context is automatically loaded
+  (last checkpoint + keyword-matched lessons). No manual grep needed.
+
+COMPRESSION FEEDBACK (Hook):
+  At session end, checks if any task failed due to lost context.
+  If yes → writes a compression lesson to prevent recurrence.
+
+CONTEXT ROT DETECTION (Hook):
+  At session end, reports GREEN/YELLOW/RED on:
+  - Steering file size, checkpoint entries, lessons count
+  - Total init_docs size, session length
+  RED = mandatory action (archive/split).
+
+ARCHIVAL:
+  - checkpoint.md > 30 entries → archive oldest, keep 20
+  - lessons.md > 20 entries → archive oldest, keep 15
+  - Never deletes — archives only
+
+OPTIONAL: Mem0 MCP (disabled by default):
+  Vector-based memory retrieval via MCP server. Requires API key.
+  Disabled for BFSI compliance. Enable in .kiro/settings/mcp.json
+  if your org allows third-party memory services.
+
+
+================================================================================
+HOOKS (Automated Enforcement)
+================================================================================
+
+These fire automatically — no user action needed:
+
+| Hook | Trigger | What it does |
+|------|---------|-------------|
+| 01-token-discipline | Every prompt | Injects Caveman Ultra + budget rules |
+| 02-context-discipline | After tool calls | Routes/caps/summarizes tool output |
+| 03-memory-discipline | Session end | Persists checkpoint/lessons/handoff |
+| 04-auto-memory-retrieval | Every prompt | Queries relevant past context |
+| 05-compression-feedback | Session end | Learns from context-loss failures |
+| context-rot-detection | Session end | GREEN/YELLOW/RED health report |
+| elite-team-orchestrator | Prompt | Enforces mode routing |
+| enforce-orchestrator-pipeline | Prompt | Validates pipeline rules |
+
+
+================================================================================
+KEY FILES
+================================================================================
+
+STEERING (rules the AI follows):
+  context-memory-discipline.md  — Core budget/caveman/headroom (always, ~100 lines)
+  memory-management.md          — Retrieval/archival/validation (conditional: init_docs)
+  phase-reporting.md            — Report templates (conditional: phase docs)
+  orchestrator-routing.md       — Mode detection + discovery enforcement (always)
+  discovery-engine.md           — 7 questions + scoring + agent activation (always)
+  skill-selection-matrix.md     — Which agents fire at which tier (always)
+  team-orchestrator.md          — Full 19-role constitution (manual, Mode 1 only)
+
+SETTINGS:
+  .kiro/settings/mcp.json       — Mem0 MCP config (disabled by default)
+
+DOCS (this folder):
+  Disciplines.txt               — Full architecture explanation (v2.0)
+  HOW-TO-USE-THIS-SETUP.txt     — THIS FILE
+  ORCHESTRATOR-FLOWCHART.txt    — Visual flow diagram
+
+
+================================================================================
+HOW TO USE IT
+================================================================================
+
+1. BUILDING SOMETHING NEW:
+   Just describe what you want. System detects build intent → 7 questions →
+   score → recommendation → you confirm → work begins.
+
+2. SINGLE DOCUMENT (Mode 2):
+   Ask using role keywords: "security review", "sprint plan", "architecture"
+
+3. QUICK TASKS (Mode 3):
+   Bug fixes, questions, refactors — just ask. No overhead.
+
+4. FORCING A MODE:
+   Say "mode N" in your prompt to skip discovery.
+
+5. SKIPPING EVERYTHING:
+   "just build it" or "skip questions" → Mode 3 direct.
+
+
+================================================================================
+TESTING REQUIREMENTS (All Modes)
+================================================================================
+
+| Mode | Requirement |
+|------|-------------|
+| Mode 3 | Write + run tests after every build. Happy path + 1 edge case. |
+| Mode 4 Lite | Unit tests for all new functions. Must pass before "done". |
+| Mode 4 Standard | Unit + integration tests. Gate before sprint end. |
+| Mode 1 Full | Unit + integration + contract + load. Gate 3 + Gate 5. |
+
+No code ships without tests. Build is INCOMPLETE until tests pass.
+
+
+================================================================================
+REPORTS (Mode 1 and Mode 4 Standard)
+================================================================================
+
+6 reports produced at EVERY phase boundary:
+  1. QA Report — tests run, coverage, bugs found/fixed
+  2. Security Report — npm audit, secrets scan, OWASP checks
+  3. Mapping Report — task status per sprint
+  4. Discipline Report — token metrics, tier, violations
+  5. Jira Task Report — epic/story/task status, velocity
+  6. Git Tracking Report — commits, branches, discipline checks
+
+Mode 3 gets a mini Build Report (tests + reads + tier + tokens saved).
+
+
+================================================================================
+TIPS
+================================================================================
+
+- The 7 questions take ~30 seconds. Worth it for right-sized output.
+- "skip questions" for anything quick.
+- Once mode is confirmed, it's LOCKED for the session.
+- Pipeline docs go in docs/phase-N/ folders.
+- Memory persists across sessions via init_docs/.
+- No third-party services required (Mem0 disabled by default).
+- The system self-improves via compression lessons and corrections.
+- Context rot is monitored automatically — you'll be warned if files bloat.
+
+
+================================================================================
+END
+================================================================================

@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Memory Discipline — claude-mem Brain Architecture",
+  "description": "Fires at session start and session end to enforce the 3-layer memory architecture. On start: reads lessons, checkpoint, project map in order. On end: writes checkpoint entry, appends any lessons from corrections, updates project map and ADR index. Ensures nothing is ever re-derived across sessions.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "MEMORY DISCIPLINE — session is ending. Execute the full memory persistence protocol.\n\n## STEP 1 — CHECKPOINT\nWrite an entry to `.kiro/init_docs/checkpoint.md`:\n```\n| [ISO timestamp] | [task completed] | [DONE/PARTIAL/BLOCKED] | [files changed] | [exact file:line resume vector] |\n```\n- Resume Vector must be exact file paths + line numbers. Another session must be able to cold-start from this line alone.\n- Absolute dates only. Never relative.\n- If file has 50+ entries → archive oldest 30 to `.kiro/init_docs/checkpoint_archive.md`, keep latest 20.\n\n## STEP 2 — LESSONS\nIf the user corrected you at any point this session → append to `.kiro/init_docs/lessons.md`:\n```markdown\n## [ISO date] — [pattern name]\n**Mistake:** [what went wrong]\n**Correction:** [what user said]\n**Rule:** [actionable rule — not a feeling — that prevents recurrence]\n**Triggers:** [keywords/situations that fire this rule]\n```\nIf no corrections this session → skip this step.\n\n## STEP 3 — PROJECT MAP\nIf any new files were created or module structure changed → update `.kiro/init_docs/project_map.md` with the new entries. Batch update — one write, not per-file.\n\n## STEP 4 — ADR INDEX\nIf any ADRs were created or superseded this session → update `.kiro/init_docs/decisions.md` with the new entries:\n```\n| ADR-NNN | [title] | [date] | [status: Accepted/Superseded] | [one-line decision] |\n```\n\n## STEP 5 — SESSION HANDOFF SEED\nAppend to `.kiro/init_docs/checkpoint.md` a handoff block:\n```\n### Session Handoff — [timestamp]\nProduct: [name]\nPhase: [current phase]\nLast action: [what was done]\nOpen tasks: [list with Jira IDs if applicable]\nKey decisions: [ADR IDs referenced]\nResume at: [file:line]\nNext session first action: [specific action]\n```\n\n## RULES\n- Never delete docs unless the code they describe is provably gone.\n- Private content → wrap in <private> tags before storing.\n- Confused about state → [RECON], announce it, don't guess.\n- If init_docs/ directory doesn't exist → create it, then execute all steps above."
+  }
+}

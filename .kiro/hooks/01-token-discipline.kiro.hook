@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Token Discipline — Caveman Ultra + Headroom",
+  "description": "Enforces token budget management on every prompt. Applies Caveman Ultra output compression (no waffle, terse fragments), Headroom 4-layer compression model (tool budgets, read dedup, summarize-and-discard), and the 2-read rule. Announces tier on threshold crossing. End-of-task budget report is mandatory.",
+  "version": "1",
+  "when": {
+    "type": "promptSubmit"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "TOKEN DISCIPLINE is active. Apply all rules before responding.\n\n## CAVEMAN ULTRA MODE\nOutput style: terse technical fragments. No filler. No preambles. No 'let me...', 'I'll now...', 'Here's what I did'. ONE sentence status max, then act.\n\n## COMPRESSION LAYERS (apply all four)\n1. Caveman Ultra — terse output, no ceremony\n2. Tool Budgets — bash cap 80 lines · read cap 300 lines · grep cap 120 lines · strip ANSI · collapse blanks\n3. Read Dedup — if a file was read earlier this session, return a stub reference, not the bytes again\n4. Summarize & Discard — after exploring any subsystem, compress to 5-line summary; raw content does not stay in context\n\n## 2-READ RULE\nMax 2 source file reads per task. At limit: STOP reading. Use map/MCP/imports/error messages to infer. Only break with [RECON].\n\n## INFER-FIRST CHAIN\nBefore ANY file read: (1) project map → (2) file names/imports/structure → (3) error messages/stack traces → (4) ask user → (5) only then read.\n\n## BUDGET TIERS\n- PEAK (0-4 reads, 0-9 tool calls): normal\n- GOOD (5-7 reads, 10-14 calls): targeted line ranges only\n- DEGRADING (8-11 reads, 15-19 calls): map-only, no new reads unless editing, pause and ask user\n- CRITICAL (12+ reads, 20+ calls): FULL STOP — map/index/context only, tell user, recommend fresh session\n\nAnnounce tier the moment you cross a threshold.\n\n## END-OF-TASK REPORT (mandatory, every task)\n> `Reads: X. Tier: Y. Estimated tokens saved: Z%.`\n\n## BANNED\n- No speculative reads (\"just checking\")\n- No full-file reads when a line range works\n- No re-reading a file to confirm an edit (edit tool confirms; trust it)\n- No drive-by improvements to code not in scope\n- No redundant tool calls"
+  }
+}

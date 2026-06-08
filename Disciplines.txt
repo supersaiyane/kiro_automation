@@ -1,0 +1,134 @@
+================================================================================
+DISCIPLINES — Context, Token & Memory Management Architecture (v2.0)
+================================================================================
+Updated: 2026-06-07
+Status: ACTIVE — Steering split complete, Mem0 MCP integrated, hooks wired.
+
+================================================================================
+1. ARCHITECTURE OVERVIEW
+================================================================================
+
+The discipline system has 3 layers:
+
+┌─────────────────────────────────────────────────────────────┐
+│ LAYER 1: STEERING FILES (prompt-level behavioral rules)     │
+├─────────────────────────────────────────────────────────────┤
+│ • context-memory-discipline.md (ALWAYS loaded, ~100 lines)  │
+│   → Core budget caps, Caveman Ultra, headroom, pruning      │
+│ • memory-management.md (CONDITIONAL: init_docs/**)          │
+│   → Retrieval rules, archival, poisoning checks, AtomMem    │
+│ • phase-reporting.md (CONDITIONAL: docs/phase-*/**)         │
+│   → Report templates, token formulas, build reports         │
+├─────────────────────────────────────────────────────────────┤
+│ LAYER 2: HOOKS (automated enforcement)                      │
+├─────────────────────────────────────────────────────────────┤
+│ • 01-token-discipline.kiro.hook (promptSubmit)              │
+│   → Injects Caveman Ultra + compression rules every turn    │
+│ • 02-context-discipline.kiro.hook (postToolUse)             │
+│   → Enforces content routing after every tool call          │
+│ • 03-memory-discipline.kiro.hook (agentStop)                │
+│   → Persists checkpoint/lessons/handoff at session end      │
+│ • 04-auto-memory-retrieval.kiro.hook (promptSubmit) [NEW]   │
+│   → Queries Mem0 MCP for relevant context before work       │
+│ • 05-compression-feedback.kiro.hook (agentStop) [NEW]       │
+│   → Detects compression failures, writes lessons            │
+│ • context-rot-detection.kiro.hook (agentStop)               │
+│   → Reports GREEN/YELLOW/RED status before session ends     │
+├─────────────────────────────────────────────────────────────┤
+│ LAYER 3: MEM0 MCP SERVER (runtime memory service) [NEW]     │
+├─────────────────────────────────────────────────────────────┤
+│ • Vector-based memory retrieval (replaces flat-file grep)   │
+│ • Automatic relevance scoring via embeddings                │
+│ • Config: .kiro/settings/mcp.json                           │
+│ • Requires: MEM0_API_KEY env variable                       │
+│ • Fallback: if unavailable, uses flat-file init_docs/       │
+└─────────────────────────────────────────────────────────────┘
+
+================================================================================
+2. WHAT CHANGED (v1.0 → v2.0)
+================================================================================
+
+| Change | Before (v1.0) | After (v2.0) |
+|--------|---------------|--------------|
+| Steering structure | 1 file, 400 lines, always loaded | 3 files: core (always) + 2 conditional |
+| Context cost | ~1600 tokens every turn | ~400 tokens always + ~600 on-demand |
+| Memory retrieval | Manual grep of flat files | Mem0 vector search (auto via hook) |
+| Compression feedback | Theory in doc, never executed | Wired hook (agentStop) |
+| Session start | Manual "read checkpoint" | Auto-retrieval hook (promptSubmit) |
+
+Estimated savings: ~60% reduction in always-on steering token cost.
+
+================================================================================
+3. HOW IT WORKS (Flow)
+================================================================================
+
+SESSION START:
+  1. Kiro loads context-memory-discipline.md (always)
+  2. promptSubmit hook fires → 04-auto-memory-retrieval queries Mem0
+  3. Mem0 returns relevant past context (decisions, lessons, resume vectors)
+  4. Agent has scoped context without reading full flat files
+
+DURING SESSION:
+  5. 01-token-discipline hook enforces Caveman Ultra every turn
+  6. 02-context-discipline hook routes tool outputs (cap, summarize)
+  7. If touching init_docs/ → memory-management.md loads (conditional)
+  8. If touching phase docs/ → phase-reporting.md loads (conditional)
+
+SESSION END:
+  9. 03-memory-discipline hook persists state to init_docs/
+  10. 05-compression-feedback hook checks for lost-context failures
+  11. context-rot-detection hook reports GREEN/YELLOW/RED
+
+================================================================================
+4. SETUP REQUIREMENTS
+================================================================================
+
+A. Mem0 MCP Server:
+   - Install uv: https://docs.astral.sh/uv/getting-started/installation/
+   - Set MEM0_API_KEY in your environment (get from https://app.mem0.ai/)
+   - Config auto-loaded from .kiro/settings/mcp.json
+   - If disabled/unavailable: system falls back to flat-file init_docs/
+
+B. Flat-File Fallback (always available):
+   - .kiro/init_docs/checkpoint.md — session state
+   - .kiro/init_docs/lessons.md — learned rules
+   - .kiro/init_docs/decisions.md — ADR index
+   - .kiro/init_docs/project_map.md — file structure
+
+================================================================================
+5. KEY PRINCIPLES
+================================================================================
+
+1. LOAD RELEVANT, NOT ALL — vector search or keyword grep, never full dump
+2. CONDITIONAL LOADING — steering files load only when their domain is active
+3. HEADROOM > HELPFULNESS — context preservation beats verbose explanations
+4. WRITE GATED — every memory write passes novelty + future-value + signal check
+5. LEARN FROM FAILURES — compression mistakes become prevention rules
+6. SELF-ACCOUNTING — every task ends with reads/tier/savings micro-report
+
+================================================================================
+6. BUDGET TIERS (Quick Reference)
+================================================================================
+
+| Tier | Reads | Tool Calls | Action |
+|------|-------|------------|--------|
+| PEAK | 0-4 | 0-9 | Normal ops |
+| GOOD | 5-7 | 10-14 | Targeted line ranges only |
+| DEGRADING | 8-11 | 15-19 | Map-only, pause and ask user |
+| CRITICAL | 12+ | 20+ | FULL STOP, recommend fresh session |
+
+================================================================================
+7. CONTEXT ROT THRESHOLDS
+================================================================================
+
+| Metric | GREEN | YELLOW | RED (mandatory action) |
+|--------|-------|--------|------------------------|
+| Steering lines | < 300 | 300-500 | > 500 (split) |
+| checkpoint.md | < 20 | 20-30 | > 30 (archive) |
+| lessons.md | < 15 | 15-20 | > 20 (archive) |
+| init_docs size | < 15KB | 15-25KB | > 25KB (split) |
+| Session exchanges | < 30 | 30-50 | > 50 (new session) |
+
+================================================================================
+END OF DISCIPLINES DOCUMENT
+================================================================================

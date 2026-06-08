@@ -1,0 +1,511 @@
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║        DISCOVERY-FIRST ORCHESTRATION — COMPLETE SYSTEM FLOWCHART                ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+
+USER PROMPT: "Build a [product]"
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     INTENT DETECTION                                         │
+│                                                                             │
+│  Is this a BUILD request? (BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT + noun)       │
+│                                                                             │
+│  ┌────────────┐          ┌──────────────┐          ┌──────────────────┐    │
+│  │ YES — build│          │ "mode N"     │          │ "just build it"  │    │
+│  │ request    │          │ in prompt    │          │ "skip questions" │    │
+│  └─────┬──────┘          └──────┬───────┘          └────────┬─────────┘    │
+│        │                        │                           │              │
+│        ▼                        ▼                           ▼              │
+│  ┌──────────┐           ┌──────────────┐          ┌──────────────────┐    │
+│  │ DISCOVERY│           │ SKIP TO MODE │          │ SKIP TO MODE 3   │    │
+│  │ ENGINE   │           │ N (full agent│          │ (Direct Execute) │    │
+│  │ (7 Qs)   │           │  set)        │          │                  │    │
+│  └─────┬────┘           └──────┬───────┘          └────────┬─────────┘    │
+│        │                        │                           │              │
+└────────┼────────────────────────┼───────────────────────────┼──────────────┘
+         │                        │                           │
+         │              ┌─────────┴───────────────────────────┘
+         │              │ (bypasses skip to EXECUTION below)
+         │              │
+         ▼              │
+═════════════════════════╪═════════════════════════════════════════════════════════
+         D I S C O V E R Y   P H A S E                       │
+         (7 Questions → Score → Tier → Agents)               │
+═════════════════════════╪═════════════════════════════════════════════════════════
+         │              │
+         ▼              │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  DISCOVERY ENGINE presents 7 questions (single prompt):              │   │
+│  │                                                                     │   │
+│  │  1. PLATFORM    → CLI / Web / Mobile / Desktop / Library / Multiple │   │
+│  │  2. SCALE       → Just me / Small team / Public / SaaS business     │   │
+│  │  3. COMPLEXITY  → Simple / Medium / Complex / Enterprise            │   │
+│  │  4. DEPLOYMENT  → Local / Server / Cloud / App stores / Multi-region│   │
+│  │  5. REVENUE     → None / Ads / One-time / Subscription / Enterprise │   │
+│  │  6. DESIGN/UX   → None / Basic / Polished / Branded                 │   │
+│  │  7. SECURITY    → Minimal / Basic auth / Privacy / Regulated        │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                            │                                                │
+│                            ▼                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  SCORING ENGINE                                                     │   │
+│  │                                                                     │   │
+│  │  Each answer = 0-3 points                                           │   │
+│  │  Total = sum of all 7 (max 21)                                      │   │
+│  │                                                                     │   │
+│  │  ┌─────────┐  ┌─────────┐  ┌──────────┐  ┌─────────┐              │   │
+│  │  │  0 - 4  │  │  5 - 9  │  │ 10 - 14  │  │ 15 - 21 │              │   │
+│  │  │MINIMAL  │  │ LIGHT   │  │ STANDARD │  │  FULL   │              │   │
+│  │  └────┬────┘  └────┬────┘  └─────┬────┘  └────┬────┘              │   │
+│  │       │             │             │             │                   │   │
+│  │       ▼             ▼             ▼             ▼                   │   │
+│  │  ┌────────┐   ┌──────────┐  ┌──────────┐  ┌──────────┐           │   │
+│  │  │Mode 3  │   │Mode 4    │  │Mode 4    │  │Mode 1    │           │   │
+│  │  │Direct  │   │Lite      │  │Standard  │  │Full Army │           │   │
+│  │  │0 agents│   │3-5 agents│  │8-12 agent│  │19 agents │           │   │
+│  │  └────────┘   └──────────┘  └──────────┘  └──────────┘           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                            │                                                │
+│                            ▼                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  PRESENT RECOMMENDATION TO USER:                                    │   │
+│  │                                                                     │   │
+│  │  "Score: X/21 → Tier: [name] → Mode: [N]"                         │   │
+│  │  "Agents to activate: [list]"                                       │   │
+│  │  "Agents skipped: [list with reasons]"                              │   │
+│  │                                                                     │   │
+│  │  Options:                                                           │   │
+│  │  [Proceed] / [Full army] / [Fewer agents] / [Just build it]        │   │
+│  └──────────────────────────┬──────────────────────────────────────────┘   │
+│                             │                                               │
+│                             ▼                                               │
+│  ┌───────────────────────────────────────────────┐                         │
+│  │  USER CONFIRMS (or overrides)                  │                         │
+│  │                                                │                         │
+│  │  "Proceed"      → use recommendation as-is    │                         │
+│  │  "Full army"    → Mode 1, all 19 agents       │                         │
+│  │  "Fewer agents" → user removes specific ones  │                         │
+│  │  "Just build it"→ Mode 3, no agents           │                         │
+│  └───────────────────────┬───────────────────────┘                         │
+│                          │                                                  │
+│         MODE + AGENTS NOW LOCKED FOR SESSION                                │
+│                                                                             │
+└──────────────────────────┼──────────────────────────────────────────────────┘
+                           │
+                           ├──────────────────────────────────────┐
+                           │                                      │
+         ┌─────────────────┼──────────────┐                      │
+         │                 │              │                       │
+         ▼                 ▼              ▼                       ▼
+┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌────────────────────────┐
+│   MODE 3     │  │  MODE 4 LITE │  │  MODE 4  │  │       MODE 1           │
+│   Direct     │  │  (Light)     │  │(Standard)│  │    (Full Army)         │
+│              │  │              │  │          │  │                        │
+│  Just code.  │  │ Lite spec +  │  │ Full spec│  │ Think → Design →      │
+│  No agents.  │  │ 3-5 agents   │  │ + 8-12   │  │ Develop (all 19)      │
+│  No docs.    │  │              │  │ agents   │  │                        │
+└──────┬───────┘  └──────┬───────┘  └─────┬────┘  └────────────┬───────────┘
+       │                 │                 │                     │
+       ▼                 ▼                 ▼                     ▼
+   [DONE]          (see below)       (see below)          (see below)
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+              M O D E   4   L I T E   (Score 5-9, 3-5 agents)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌────────────────────────────────────────────────────────────────┐        │
+│  │  LITE PLANNING (skip Think phase entirely)                     │        │
+│  │                                                                │        │
+│  │  CTO (lite)     → Tech stack table only (1 page)              │        │
+│  │  PM (lite)      → 5-8 user stories with basic AC              │        │
+│  │  Architect(lite)→ 1 component diagram + key ADRs              │        │
+│  └────────────────────────────────┬───────────────────────────────┘        │
+│                                   │                                         │
+│                                   ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────┐        │
+│  │  LITE EXECUTION (3-5 agents only)                              │        │
+│  │                                                                │        │
+│  │  Backend Lead    → Implement backend                           │        │
+│  │  Frontend Lead*  → Implement frontend (if UI exists)           │        │
+│  │  QA (lite)       → Unit tests only (no integration/load)       │        │
+│  │  Sr. Engineer(s) → Write code                                  │        │
+│  └────────────────────────────────┬───────────────────────────────┘        │
+│                                   │                                         │
+│                                   ▼                                         │
+│                              [DONE — ship it]                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+            M O D E   4   S T A N D A R D   (Score 10-14, 8-12 agents)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌────────────────────────────────────────────────────────────────┐        │
+│  │  PLANNING PHASE (Kiro Spec Workflow)                           │        │
+│  │                                                                │        │
+│  │  .kiro/specs/{name}/requirements.md  ← PM + CTO               │        │
+│  │  .kiro/specs/{name}/design.md        ← Architect + DB + Cloud  │        │
+│  │  .kiro/specs/{name}/tasks.md         ← Scrum Master            │        │
+│  └────────────────────────────────┬───────────────────────────────┘        │
+│                                   │                                         │
+│                                   ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────┐        │
+│  │  EXECUTION PHASE (selected agents from score)                  │        │
+│  │                                                                │        │
+│  │  Uses requirements.md as PRD (skip Market Researcher + CTO)    │        │
+│  │  Uses design.md as architecture (skip Architect from scratch)  │        │
+│  │  Runs Develop chain: sprints, gates, selected agents only      │        │
+│  │                                                                │        │
+│  │  ≥2 sprints per phase                                          │        │
+│  │  ≥3 tasks per sprint                                           │        │
+│  │  Security + QA mandatory (if activated by score)               │        │
+│  │  DevOps if cloud deployment indicated                          │        │
+│  └────────────────────────────────┬───────────────────────────────┘        │
+│                                   │                                         │
+│                                   ▼                                         │
+│                    6 reports at phase end                                    │
+│                    (QA, Security, Mapping, Discipline, Jira, Git)           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+                M O D E   1 :   F U L L   A R M Y   P I P E L I N E
+                (Score 15-21, all 19 agents, full Think→Design→Develop)
+═══════════════════════════════════════════════════════════════════════════════════
+
+NOTE: Discovery has ALREADY confirmed this mode is justified (score 15+).
+All 19 agents are warranted. Load team-orchestrator.md (manual steering).
+
+                      │
+                      ▼
+═══════════════════════════════════════════════════════════════════════════════════
+                         P H A S E :  T H I N K
+                         (Why + What — No Code)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌──────────────────────┐                                                   │
+│  │  MARKET RESEARCHER   │  Produces: /docs/foundation/market-research.md    │
+│  │                      │  • TAM/SAM/SOM with sources                      │
+│  │  • Personas (JTBD)   │  • 3+ competitors with gaps                       │
+│  │  • Segments          │  • Market opportunity                             │
+│  │  • Positioning       │                                                   │
+│  └──────────┬───────────┘                                                   │
+│             │                                                               │
+│             ▼                                                               │
+│  ┌──────────────────────┐                                                   │
+│  │  CTO                 │  Produces: /docs/foundation/vision-strategy.md    │
+│  │                      │  • Build-vs-buy (7 components, 3yr TCO)           │
+│  │  • Tech strategy     │  • Risk register (5+ entries)                     │
+│  │  • Vendor approvals  │  • Approved vendor list                           │
+│  │  • Risk register     │                                                   │
+│  └──────────┬───────────┘                                                   │
+│             │                                                               │
+└─────────────┼───────────────────────────────────────────────────────────────┘
+              │
+              ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ╔═══════════════════════════╗                             │
+│                    ║  GATE 1: THINK → DESIGN  ║                             │
+│                    ╚═══════════════════════════╝                             │
+│                                                                             │
+│  Checklist:                                                                 │
+│  □ Personas have quoted JTBD                                                │
+│  □ TAM/SAM/SOM math with named sources                                     │
+│  □ 3+ named competitors with concrete gaps                                 │
+│  □ Build-vs-buy covers 7 components with 3yr TCO                            │
+│  □ Approved vendor list is closed-set                                       │
+│  □ Risk register has 5+ entries with mitigations                            │
+│                                                                             │
+│  ┌─────────┐     ┌──────────┐                                              │
+│  │ ANY RED │────►│  BLOCK   │──► Fix responsible role artifact              │
+│  └─────────┘     └──────────┘                                              │
+│  ┌─────────┐     ┌──────────────────────────────────────┐                  │
+│  │ALL GREEN│────►│ Ask user: "Confirm to proceed?"      │                  │
+│  └─────────┘     └──────────────────┬───────────────────┘                  │
+│                                     │ USER SAYS YES                         │
+└─────────────────────────────────────┼───────────────────────────────────────┘
+                                      │
+                                      ▼
+═══════════════════════════════════════════════════════════════════════════════════
+                         P H A S E :  D E S I G N
+                         (How — Architecture, Contracts, Security)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌──────────────────────┐                                                   │
+│  │  PRODUCT MANAGER     │  Produces: PRD + user stories + AC                │
+│  │  • PRD (outcomes)    │  • All stories pass INVEST                        │
+│  │  • User stories      │  • Concrete values (no "fast"/"intuitive")       │
+│  │  • Acceptance criteria│  • Gantt v0                                      │
+│  └──────────┬───────────┘                                                   │
+│             │                                                               │
+│             ▼                                                               │
+│  ┌──────────────────────┐                                                   │
+│  │  ARCHITECT           │  Produces: /docs/foundation/system-design.md      │
+│  │  • ADRs              │  • API contracts (OpenAPI)                         │
+│  │  • Data model        │  • Capacity planning                              │
+│  │  • Gantt v1          │  • C4 diagrams                                    │
+│  └──────────┬───────────┘                                                   │
+│             │                                                               │
+│     ┌───────┼───────────────────────┐                                       │
+│     │       │                       │                                       │
+│     ▼       ▼                       ▼                                       │
+│  ┌────────────────┐ ┌────────────────┐ ┌────────────────────┐              │
+│  │ DATABASE       │ │ CLOUD          │ │ SECURITY           │              │
+│  │ ARCHITECT      │ │ ARCHITECT      │ │ ENGINEER           │              │
+│  │ • Schema DDL   │ │ • VPC/IAM      │ │ • STRIDE model     │              │
+│  │ • ERD          │ │ • Landing zone │ │ • Auth design      │              │
+│  │ • Migrations   │ │ • Multi-region │ │ • Compliance ADRs  │              │
+│  │ • Retention    │ │ • FinOps base  │ │ • Trust boundaries │              │
+│  └───────┬────────┘ └───────┬────────┘ └─────────┬──────────┘              │
+│          │                  │                     │                         │
+│          │                  ▼                     │                         │
+│          │       ┌────────────────┐               │                         │
+│          │       │ FINOPS         │               │                         │
+│          │       │ ARCHITECT      │               │                         │
+│          │       │ • Unit econ    │               │                         │
+│          │       │ • 12mo project │               │                         │
+│          │       │ • Budget guard │               │                         │
+│          │       └───────┬────────┘               │                         │
+│          │               │                        │                         │
+│          └───────────────┼────────────────────────┘                         │
+│                          │                                                  │
+│                          ▼                                                  │
+│  ┌──────────────────────────────────────┐                                   │
+│  │  SCRUM MASTER                        │                                   │
+│  │  • /docs/foundation/roadmap.md       │ ← COMPLETE PRODUCT ROADMAP       │
+│  │  • Velocity baseline                 │                                   │
+│  │  • DoD per story/sprint/release      │                                   │
+│  └──────────────────┬───────────────────┘                                   │
+│                     │                                                       │
+└─────────────────────┼───────────────────────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ╔═══════════════════════════════╗                         │
+│                    ║  GATE 2: DESIGN → DEVELOP    ║                         │
+│                    ╚═══════════════════════════════╝                         │
+│                                                                             │
+│  Checklist:                                                                 │
+│  □ PRD goals are outcome-shaped                                             │
+│  □ Every story passes INVEST                                                │
+│  □ AC uses concrete values                                                  │
+│  □ All ADRs have rejected alternatives                                      │
+│  □ API contracts concrete enough for parallel FE+BE                         │
+│  □ Schema DDL covers every PRD entity                                       │
+│  □ Security threat model covers every trust boundary                        │
+│  □ Gantt v1 is acyclic, role-tagged                                         │
+│  □ Sprint plan has velocity baseline                                        │
+│  □ DoD defined per story, sprint, release                                   │
+│                                                                             │
+│  ┌─────────┐     ┌──────────┐                                              │
+│  │ ANY RED │────►│  BLOCK   │──► Name responsible role, fix                 │
+│  └─────────┘     └──────────┘                                              │
+│  ┌─────────┐                                                               │
+│  │ALL GREEN│────► DESIGN approved → Proceed to Develop                      │
+│  └─────────┘                                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                      │
+                      ▼
+═══════════════════════════════════════════════════════════════════════════════════
+                         P H A S E :  D E V E L O P
+              (Agile Sprints — per phase, pulling scope from roadmap)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ╔═══════════════════════════════════════════════════════╗                   │
+│  ║  PHASE N BEGINS                                      ║                   │
+│  ║  Scrum Master reads Phase N from roadmap.md          ║                   │
+│  ║  Produces: /docs/phase-N/sprint-plan.md              ║                   │
+│  ╚═══════════════════════════════════╤═══════════════════╝                   │
+│                                      │                                      │
+│         ┌────────────────────────────┼────────────────────────────┐         │
+│         │                            │                            │         │
+│         ▼                            ▼                            ▼         │
+│  ┌──────────────┐           ┌──────────────┐           ┌──────────────┐    │
+│  │ SPRINT N.1   │           │ SPRINT N.2   │           │ SPRINT N.M   │    │
+│  └──────┬───────┘           └──────┬───────┘           └──────┬───────┘    │
+│         │                          │                          │             │
+│         ▼                          ▼                          ▼             │
+│                                                                             │
+│  ┌─────────────────── SPRINT LOOP (repeats per sprint) ──────────────────┐  │
+│  │                                                                       │  │
+│  │  ┌────────────────┐  ┌────────────────┐                              │  │
+│  │  │ BACKEND LEAD   │  │ FRONTEND LEAD  │  Plan implementation          │  │
+│  │  │ • API plan     │  │ • Components   │                              │  │
+│  │  │ • Caching      │  │ • Design tokens│                              │  │
+│  │  │ • Rate limiting│  │ • a11y/WCAG    │                              │  │
+│  │  └───────┬────────┘  └───────┬────────┘                              │  │
+│  │          │                   │                                        │  │
+│  │          ▼                   ▼                                        │  │
+│  │  ┌────────────────┐  ┌────────────────┐                              │  │
+│  │  │ SR. ENGINEER   │  │ SR. ENGINEER   │  Write actual code            │  │
+│  │  │ (BACKEND)      │  │ (FRONTEND)     │                              │  │
+│  │  │ • Implement    │  │ • Implement    │                              │  │
+│  │  │ • Error handle │  │ • State mgmt   │                              │  │
+│  │  │ • Edge cases   │  │ • Edge cases   │                              │  │
+│  │  └───────┬────────┘  └───────┬────────┘                              │  │
+│  │          │                   │                                        │  │
+│  │          └─────────┬─────────┘                                        │  │
+│  │                    │                                                  │  │
+│  │                    ▼                                                  │  │
+│  │  ┌─────────────────────────────────────────┐                          │  │
+│  │  │  GATE S1: PACKAGE APPROVAL              │ (if new dependency)      │  │
+│  │  │  • CVE scan                             │                          │  │
+│  │  │  • Supply chain check                   │                          │  │
+│  │  │  • License compatibility                │                          │  │
+│  │  │  APPROVED / REJECTED / DEFERRED         │                          │  │
+│  │  └─────────────────┬───────────────────────┘                          │  │
+│  │                    │                                                  │  │
+│  │                    ▼                                                  │  │
+│  │  ┌────────────────────────────────┐                                   │  │
+│  │  │  ML ENGINEER (if applicable)   │                                   │  │
+│  │  │  • Model selection             │                                   │  │
+│  │  │  • Training pipeline           │                                   │  │
+│  │  │  • Inference API               │                                   │  │
+│  │  └───────────────┬────────────────┘                                   │  │
+│  │                  │                                                    │  │
+│  │                  ▼                                                    │  │
+│  │  ┌────────────────────────────────┐                                   │  │
+│  │  │  QA ENGINEER                   │                                   │  │
+│  │  │  • Unit + Integration tests    │                                   │  │
+│  │  │  • Contract + Load tests       │                                   │  │
+│  │  │  • Mutation coverage           │                                   │  │
+│  │  └───────────────┬────────────────┘                                   │  │
+│  │                  │                                                    │  │
+│  │                  ▼                                                    │  │
+│  │  ┌─────────────────────────────────────────┐                          │  │
+│  │  │  GATE S2: FEATURE SECURITY REVIEW       │                          │  │
+│  │  │  • SAST scan                            │                          │  │
+│  │  │  • OWASP Top 10                         │                          │  │
+│  │  │  • Secrets scan (gitleaks)              │                          │  │
+│  │  └─────────────────┬───────────────────────┘                          │  │
+│  │                    │                                                  │  │
+│  │                    ▼                                                  │  │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │  │
+│  │  │          ╔═════════════════════════════════════╗                 │  │  │
+│  │  │          ║  GATE 3: QA → COMMIT (per feature) ║                 │  │  │
+│  │  │          ╚═════════════════════════════════════╝                 │  │  │
+│  │  │  □ Coverage ≥ threshold     □ No regression                     │  │  │
+│  │  │  □ Contract tests pass      □ Load test OK                      │  │  │
+│  │  │  □ Security scan clean      □ Code review approved              │  │  │
+│  │  │                                                                 │  │  │
+│  │  │  ANY RED → return to engineer │ ALL GREEN → commit + push       │  │  │
+│  │  └────────────────────────────────────────────────────────────────┘  │  │
+│  │                    │                                                  │  │
+│  │                    ▼                                                  │  │
+│  │  ┌────────────────────────────────┐                                   │  │
+│  │  │  DEVOPS ENGINEER              │                                   │  │
+│  │  │  • CI/CD pipeline             │                                   │  │
+│  │  │  • IaC (Terraform)            │                                   │  │
+│  │  │  • Deploy to staging          │                                   │  │
+│  │  └───────────────┬────────────────┘                                   │  │
+│  │                  │                                                    │  │
+│  │                  ▼                                                    │  │
+│  │  ┌────────────────────────────────┐                                   │  │
+│  │  │  SRE ENGINEER                 │                                   │  │
+│  │  │  • SLI/SLO review             │                                   │  │
+│  │  │  • Alert rules + Runbooks     │                                   │  │
+│  │  └───────────────┬────────────────┘                                   │  │
+│  │                  │                                                    │  │
+│  │                  ▼                                                    │  │
+│  │  ┌────────────────────────────────┐                                   │  │
+│  │  │  TECHNICAL WRITER             │                                   │  │
+│  │  │  • Changelog + ADR index      │                                   │  │
+│  │  │  • Runbooks + Living docs     │                                   │  │
+│  │  └───────────────┬────────────────┘                                   │  │
+│  │                  │                                                    │  │
+│  │                  ▼                                                    │  │
+│  │  ┌────────────────────────────────────────────────────────────────┐   │  │
+│  │  │          ╔═══════════════════════════════════╗                  │   │  │
+│  │  │          ║  GATE 4: SPRINT END              ║                  │   │  │
+│  │  │          ╚═══════════════════════════════════╝                  │   │  │
+│  │  │  1. SRE reviews SLI/SLO                                        │   │  │
+│  │  │  2. TW updates docs                                           │   │  │
+│  │  │  3. Scrum Master: retro + velocity                             │   │  │
+│  │  │  Announce: "Sprint N.M complete. Proceed?"                     │   │  │
+│  │  └───────────────────────────┬────────────────────────────────────┘   │  │
+│  │                              │                                        │  │
+│  └──────────────────────────────┼────────────────────────────────────────┘  │
+│                                 │                                           │
+│              ┌──────────────────┴──────────────────┐                        │
+│              │ Last sprint in Phase N?             │                        │
+│              └──────────┬─────────────────┬────────┘                        │
+│                    NO   │                 │ YES                              │
+│                         ▼                 ▼                                  │
+│              ┌────────────┐    ┌──────────────────────────────────────┐     │
+│              │ Next Sprint│    │        ╔═══════════════════════╗     │     │
+│              │ (loop back)│    │        ║  GATE 5: PHASE-END   ║     │     │
+│              └────────────┘    │        ╚═══════════════════════╝     │     │
+│                                │                                      │     │
+│                                │  1. Full regression QA               │     │
+│                                │  2. Full security audit              │     │
+│                                │                                      │     │
+│                                │  ANY RED → rejection loop            │     │
+│                                │  ALL GREEN → phase closure:          │     │
+│                                │                                      │     │
+│                                │  • 6 reports produced:               │     │
+│                                │    QA, Security, Mapping,            │     │
+│                                │    Discipline, Jira, Git             │     │
+│                                │  • Phase marked DONE in roadmap      │     │
+│                                │  • "Phase N CLOSED. Proceed?"        │     │
+│                                └──────────────────────┬───────────────┘     │
+│                                                       │                     │
+└───────────────────────────────────────────────────────┼─────────────────────┘
+                                                        │
+                      ┌─────────────────────────────────┴────────┐
+                      │ Last phase in roadmap?                    │
+                      └───────────────┬─────────────────┬────────┘
+                              NO      │                 │ YES
+                                      ▼                 ▼
+                           ┌──────────────┐  ┌─────────────────────────────┐
+                           │ Phase N+1    │  │  RELEASE                    │
+                           │ (loop back)  │  │  • TW finalizes all docs    │
+                           └──────────────┘  │  • SRE publishes runbooks   │
+                                             │  • DevOps: prod deployment  │
+                                             │  • Website Creator: landing │
+                                             │    page (if marketing site) │
+                                             └─────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+                    S U M M A R Y :  D I S C O V E R Y   G A T E S   E N T R Y
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  The key insight: DISCOVERY gates the entire pipeline.                       │
+│                                                                             │
+│  BEFORE discovery existed:                                                  │
+│    User says "build X" → Mode 1 fires → 19 agents → overkill for small X   │
+│                                                                             │
+│  AFTER discovery:                                                           │
+│    User says "build X" → 7 questions → score → RIGHT mode + RIGHT agents   │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                                                                       │  │
+│  │   "Build calculator"  → Score 1  → Mode 3 → 0 agents  → just code   │  │
+│  │   "Build task app"    → Score 8  → Mode 4L→ 5 agents  → lite flow   │  │
+│  │   "Build fitness app" → Score 14 → Mode 4 → 10 agents → standard    │  │
+│  │   "Build fintech SaaS"→ Score 20 → Mode 1 → 19 agents → full army   │  │
+│  │                                                                       │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  No more all-or-nothing. The system is proportional.                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
