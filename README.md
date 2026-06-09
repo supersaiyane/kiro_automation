@@ -34,8 +34,6 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/last-commit/supersaiyane/kiro_automation?style=flat-square" alt="Last Commit"/>
-  <img src="https://img.shields.io/github/repo-size/supersaiyane/kiro_automation?style=flat-square" alt="Repo Size"/>
   <img src="https://img.shields.io/github/stars/supersaiyane/kiro_automation?style=social" alt="Stars"/>
 </p>
 
